@@ -1,0 +1,56 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model project {
+  id                Int            @id @default(autoincrement())
+  name              String         @unique
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  versions          version[]
+  featureFlags      featureFlag[]
+  featureFlagValues featureFlagValue[]
+  @@map(name: "Projects")
+}
+
+model version {
+  id                Int      @id @default(autoincrement())
+  name              String   
+  project           project  @relation(fields: [projectId], references: [id])
+  projectId         Int
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  featureFlagValues featureFlagValue[]
+  @@map(name: "Versions")
+}
+
+model featureFlag {
+  id           Int      @id @default(autoincrement())
+  name         String   
+  project      project  @relation(fields: [projectId], references: [id])
+  projectId    Int
+  defaultValue Boolean  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  featureFlagValues featureFlagValue[]
+  @@map(name: "FeatureFlags")
+}
+
+model featureFlagValue {
+  project     project     @relation(fields: [projectId], references: [id])
+  projectId   Int
+  version     version     @relation(fields: [versionId], references: [id])
+  versionId   Int
+  featureFlag featureFlag @relation(fields: [flagId], references: [id])
+  flagId      Int
+  value       Boolean  
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  @@unique([projectId, versionId, flagId], name: "project_version_flag_key")
+  @@map(name: "FeatureFlagValues")
+}
