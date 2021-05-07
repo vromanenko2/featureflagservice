@@ -1,5 +1,5 @@
 # featureflagservice
-# init script
+# init back end app
 git clone https://github.com/vromanenko2/featureflagservice.git  
 cd featureflagservice/backend  
 npm install  
